@@ -24,3 +24,4 @@ a=[(0,1),(1,2)]
 b=random.choice(a)
 print (b)
 print(b[1])
+print('holas')
