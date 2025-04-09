@@ -166,6 +166,20 @@ class Grafo:
             CoorNodos.pop()
             i+=1
             
+    def Malla(self, filas, columnas):
+        
+        for i in range(filas):
+            for j in range(1,columnas):
+                origen=f'{i}_{j-1}'
+                destino=f'{i}_{j}'
+                self.agregar_arista(origen,destino)
+                
+        for j in range(columnas):
+            for i in range(1,filas):
+                origen=f'{i-1}_{j}'
+                destino=f'{i}_{j}'
+                self.agregar_arista(origen,destino)
+                    
         
     def __str__(self):
         tipo = "Dirigido" if self.dirigido else "No dirigido"
