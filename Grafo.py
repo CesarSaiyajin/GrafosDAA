@@ -94,10 +94,12 @@ class Grafo:
                 if random.random() < proba and self.existe_arista(i,j) == self.dirigido:
                     self.agregar_arista(i, j)
                     
-    def GeoSimple(self, Nodos, distancia_max, base = 200, altura = 200):
+    def GeoSimple(self, Nodos, distancia_max):
         for nodo in range(Nodos):
-            x = random.uniform(0, base)
-            y = random.uniform(0, altura)
+            x = random.uniform(0, Nodos)
+            y = random.uniform(0, Nodos)
+            #x = random.uniform(0, base)
+            #y = random.uniform(0, altura)
             self.crearNodoGeo(nodo, x, y)
         
         for i in range(Nodos):

@@ -1,36 +1,84 @@
 import Grafo as gr
 
-#ErdosRenyi = gr.Grafo()
-#ErdosRenyi.ErdosRenyi(Nodos=30,Aristas=90)
-#ErdosRenyi.archivo_grafo('ErdosRenyi30')
+ErdosRenyi = gr.Grafo()
+ErdosRenyi.ErdosRenyi(Nodos=50,Aristas=100)
+ErdosRenyi.archivo_grafo('ErdosRenyi50')
 #print(ErdosRenyi)
 
-#Gilbert = gr.Grafo()
-#Gilbert.Gilbert(Nodos = 30, proba = .25)
-#Gilbert.archivo_grafo('Gilbert30')
+ErdosRenyi = gr.Grafo()
+ErdosRenyi.ErdosRenyi(Nodos=200,Aristas=400)
+ErdosRenyi.archivo_grafo('ErdosRenyi200')
+
+ErdosRenyi = gr.Grafo()
+ErdosRenyi.ErdosRenyi(Nodos=500,Aristas=1000)
+ErdosRenyi.archivo_grafo('ErdosRenyi500')
+
+Gilbert = gr.Grafo()
+Gilbert.Gilbert(Nodos = 50, proba = .25)
+Gilbert.archivo_grafo('Gilbert50')
 #print(Gilbert)
+
+Gilbert = gr.Grafo()
+Gilbert.Gilbert(Nodos = 200, proba = .05)
+Gilbert.archivo_grafo('Gilbert200')
+
+Gilbert = gr.Grafo()
+Gilbert.Gilbert(Nodos = 500, proba = .02)
+Gilbert.archivo_grafo('Gilbert500')
+
+GeoSimple = gr.Grafo()
+GeoSimple.GeoSimple(Nodos = 50, distancia_max = 15)
+GeoSimple.archivo_grafo('GeoSimple50')
+#print(GeoSimple)
 
 GeoSimple = gr.Grafo()
 GeoSimple.GeoSimple(Nodos = 200, distancia_max = 25)
-GeoSimple.archivo_grafo('GeoSimple30')
-#print(GeoSimple)
+GeoSimple.archivo_grafo('GeoSimple200')
 
-BarabasiAlbert = gr.Grafo()
-BarabasiAlbert.BarabasiAlbert(Nodos = 100, Conexiones = 14)
-BarabasiAlbert.archivo_grafo('BarabasiAlbert30')
+GeoSimple = gr.Grafo()
+GeoSimple.GeoSimple(Nodos = 500, distancia_max = 50)
+GeoSimple.archivo_grafo('GeoSimple500')
+
+#BarabasiAlbert = gr.Grafo()
+#BarabasiAlbert.BarabasiAlbert(Nodos = 50, Conexiones = 10)
+#BarabasiAlbert.archivo_grafo('BarabasiAlbert30')
 #print(BarabasiAlbert)
 
 BarabasiAlbertInverso = gr.Grafo()
-BarabasiAlbertInverso.BarabasiAlbertInverso(Nodos = 100, Conexiones = 14)
-BarabasiAlbertInverso.archivo_grafo('BarabasiAlbertInverso30')
+BarabasiAlbertInverso.BarabasiAlbertInverso(Nodos = 50, Conexiones = 10)
+BarabasiAlbertInverso.archivo_grafo('BarabasiAlbertInverso50')
 #print(BarabasiAlbertInverso)
 
+BarabasiAlbertInverso = gr.Grafo()
+BarabasiAlbertInverso.BarabasiAlbertInverso(Nodos = 200, Conexiones = 20)
+BarabasiAlbertInverso.archivo_grafo('BarabasiAlbertInverso200')
+
+BarabasiAlbertInverso = gr.Grafo()
+BarabasiAlbertInverso.BarabasiAlbertInverso(Nodos = 500, Conexiones = 50)
+BarabasiAlbertInverso.archivo_grafo('BarabasiAlbertInverso500')
+
 DorogovtsevMendes = gr.Grafo()
-DorogovtsevMendes.DorogovtsevMendes(Nodos = 100)
-DorogovtsevMendes.archivo_grafo('DorogovtsevMendes30')
+DorogovtsevMendes.DorogovtsevMendes(Nodos = 50)
+DorogovtsevMendes.archivo_grafo('DorogovtsevMendes50')
 #print(DorogovtsevMendes)
 
+DorogovtsevMendes = gr.Grafo()
+DorogovtsevMendes.DorogovtsevMendes(Nodos = 200)
+DorogovtsevMendes.archivo_grafo('DorogovtsevMendes200')
+
+DorogovtsevMendes = gr.Grafo()
+DorogovtsevMendes.DorogovtsevMendes(Nodos = 500)
+DorogovtsevMendes.archivo_grafo('DorogovtsevMendes500')
+
 Malla = gr.Grafo()
-Malla.Malla(filas = 100, columnas=100)
-Malla.archivo_grafo('Malla')
-print(Malla)
+Malla.Malla(filas = 5, columnas=10)
+Malla.archivo_grafo('Malla50')
+#print(Malla)
+
+Malla = gr.Grafo()
+Malla.Malla(filas = 20, columnas=10)
+Malla.archivo_grafo('Malla200')
+
+Malla = gr.Grafo()
+Malla.Malla(filas = 50, columnas=10)
+Malla.archivo_grafo('Malla500')
