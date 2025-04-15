@@ -191,7 +191,7 @@ class Grafo:
         return f"Grafo ({tipo})\nNodos: [{nodos}]\nAristas:\n{aristas}"
     
     def archivo_grafo(self, valor):
-        f = open(str(valor+".dot"), "w")
+        f = open(str(valor+".gv"), "w")
         f.write(str('graph '+valor+'={\n'))
         f.write(";\n".join(str(nodo.obtener_valor()) for nodo in self.obtener_nodos()))
         f.write(";\n")
