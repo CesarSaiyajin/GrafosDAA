@@ -2,6 +2,7 @@ import Arista as ar
 import Nodo as nd
 import random  
 import math
+import collections
 
 class Grafo:
     def __init__(self, dirigido = False):
@@ -38,17 +39,17 @@ class Grafo:
         else:
             return len(nodo.obtener_vecinos())
     
-    def agregar_arista(self, origen, destino):
+    def agregar_arista(self, origen, destino, peso=1):
         nodo_origen = self.crearNodo(origen)
         nodo_destino = self.crearNodo(destino)
         
         arista = ar.Arista(nodo_origen, nodo_destino, self.dirigido)
         self.aristas.append(arista)
         
-        nodo_origen.agregar_vecino(nodo_destino)
+        nodo_origen.agregar_vecino(nodo_destino, peso)
         
         if not self.dirigido:
-            nodo_destino.agregar_vecino(nodo_origen)
+            nodo_destino.agregar_vecino(nodo_origen, peso)
         
         return arista
     
@@ -181,8 +182,94 @@ class Grafo:
                 origen=f'{i-1}_{j}'
                 destino=f'{i}_{j}'
                 self.agregar_arista(origen,destino)
-                    
-        
+    
+    def BFS(self, inicio):
+        if inicio not in self.nodos:
+            return None
+
+        cola = collections.deque([self.nodos[inicio]])
+        visitados = {inicio}
+        padres = {inicio: None}
+        arbol_bfs = Grafo(dirigido=True) # Creamos un nuevo grafo dirigido para el árbol BFS
+
+        # Añadimos el nodo inicial al nuevo grafo
+        arbol_bfs.crearNodo(inicio)
+
+        while cola:
+            nodo_actual = cola.popleft()
+            valor_actual = nodo_actual.obtener_valor()
+
+            for vecino, _ in nodo_actual.obtener_vecinos().items():
+                valor_vecino = vecino.obtener_valor()
+                if valor_vecino not in visitados:
+                    visitados.add(valor_vecino)
+                    padres[valor_vecino] = valor_actual
+                    cola.append(vecino)
+
+                    # Añadimos el nodo vecino al nuevo grafo
+                    arbol_bfs.crearNodo(valor_vecino)
+                    # Añadimos la arista dirigida desde el padre al hijo en el árbol BFS
+                    arbol_bfs.agregar_arista(valor_actual, valor_vecino)
+
+        return arbol_bfs
+    
+    def DFS_R(self, inicio, visitados=None, arbol_dfs_r=None):
+        if visitados is None:
+            visitados = set()
+        if arbol_dfs_r is None:
+            arbol_dfs_r = Grafo(dirigido=True)
+            if inicio in self.nodos:
+                arbol_dfs_r.crearNodo(inicio)
+            else:
+                return None # El nodo de inicio no existe
+
+        visitados.add(inicio)
+        nodo_actual = self.obtener_nodo(inicio)
+
+        if nodo_actual:
+            for vecino_obj, _ in nodo_actual.obtener_vecinos().items():
+                vecino = vecino_obj.obtener_valor()
+                if vecino not in visitados:
+                    arbol_dfs_r.crearNodo(vecino)
+                    arbol_dfs_r.agregar_arista(inicio, vecino)
+                    self.DFS_R(vecino, visitados, arbol_dfs_r)
+
+        return arbol_dfs_r
+    
+    def DFS_I(self, inicio):
+        if inicio not in self.nodos:
+            return None  # El nodo de inicio no existe
+
+        visitados = set()
+        stack = [inicio]
+
+        arbol_dfs_i = Grafo(dirigido=True)
+        arbol_dfs_i.crearNodo(inicio)
+        visitados.add(inicio)
+
+        while stack:
+            actual = stack.pop()
+            nodo_actual = self.obtener_nodo(actual)
+
+            if nodo_actual:
+            # Invertir el orden de los vecinos para emular DFS recursivo
+                vecinos = sorted(
+                    nodo_actual.obtener_vecinos().items(), 
+                    key=lambda x: x[0].obtener_valor(), 
+                    reverse=True
+                )
+
+                for vecino_obj, _ in vecinos:
+                    vecino = vecino_obj.obtener_valor()
+                    if vecino not in visitados:
+                        visitados.add(vecino)
+                        arbol_dfs_i.crearNodo(vecino)
+                        arbol_dfs_i.agregar_arista(actual, vecino)
+                        stack.append(vecino)
+
+        return arbol_dfs_i
+    
+
     def __str__(self):
         tipo = "Dirigido" if self.dirigido else "No dirigido"
         nodos = ", ".join(str(nodo.obtener_valor()) for nodo in self.obtener_nodos())
@@ -198,3 +285,4 @@ class Grafo:
         f.write(";\n".join(str(arista) for arista in self.obtener_aristas()))
         f.write(";\n}")
         f.close()
+        
