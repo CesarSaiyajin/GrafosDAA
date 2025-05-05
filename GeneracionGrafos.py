@@ -8,7 +8,7 @@ arbol2=ErdosRenyi.DFS_R(0)
 arbol3=ErdosRenyi.DFS_I(0)
 arbol.archivo_grafo('BFS_ErdosRenyi50')
 arbol2.archivo_grafo('DFS_R_ErdosRenyi50')
-arbol3.archivo_grafo('BFS_I_ErdosRenyi50')
+arbol3.archivo_grafo('DFS_I_ErdosRenyi50')
 
 
 ErdosRenyi = gr.Grafo()
@@ -19,7 +19,7 @@ arbol2=ErdosRenyi.DFS_R(0)
 arbol3=ErdosRenyi.DFS_I(0)
 arbol.archivo_grafo('BFS_ErdosRenyi200')
 arbol2.archivo_grafo('DFS_R_ErdosRenyi200')
-arbol3.archivo_grafo('BFS_I_ErdosRenyi200')
+arbol3.archivo_grafo('DFS_I_ErdosRenyi200')
 
 ErdosRenyi = gr.Grafo()
 ErdosRenyi.ErdosRenyi(Nodos=500,Aristas=1000)
