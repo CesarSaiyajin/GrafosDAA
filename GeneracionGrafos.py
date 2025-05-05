@@ -29,7 +29,7 @@ arbol2=ErdosRenyi.DFS_R(0)
 arbol3=ErdosRenyi.DFS_I(0)
 arbol.archivo_grafo('BFS_ErdosRenyi500')
 arbol2.archivo_grafo('DFS_R_ErdosRenyi500')
-arbol3.archivo_grafo('BFS_I_ErdosRenyi500')
+arbol3.archivo_grafo('DFS_I_ErdosRenyi500')
 
 #Gilbert = gr.Grafo()
 #Gilbert.Gilbert(Nodos = 50, proba = .25)
