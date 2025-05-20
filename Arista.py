@@ -10,6 +10,10 @@ class Arista:
     
     def es_dirigida(self): 
         return self.dirigida
+    
+    def obtener_peso(self):
+        # El peso está guardado en el nodo origen
+        return self.origen.obtener_vecinos()[self.destino]
         
      
     def __str__(self):

@@ -12,6 +12,9 @@ class Nodo:
     def obtener_valor(self):
         return self.valor
     
+    def obtener_peso_vecino(self, nodo):
+        return self.vecinos.get(nodo, float('inf'))
+    
     def __str__(self):
         
         vecinos_str = ", ".join([f"{n.obtener_valor()}" for n in self.vecinos.items()])

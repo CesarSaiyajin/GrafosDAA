@@ -269,6 +269,53 @@ class Grafo:
 
         return arbol_dfs_i
     
+    def Dijkstra(self, inicio):
+        """
+        Algoritmo de Dijkstra para encontrar el árbol de caminos más cortos desde un nodo inicial.
+        
+        Args:
+            inicio: Valor del nodo inicial
+            
+        Returns:
+            Un objeto de la clase Grafo que representa el árbol de caminos más cortos
+        """
+        nodo_inicio = self.obtener_nodo(inicio)
+        if not nodo_inicio:
+            return Grafo()
+
+        # Inicializar estructuras
+        distancias = {nodo.obtener_valor(): float('inf') for nodo in self.obtener_nodos()}
+        distancias[inicio] = 0
+        visitados = set()
+        cola_prioridad = [(0, nodo_inicio)]  # (distancia, nodo)
+        arbol_dijkstra = Grafo()
+        arbol_dijkstra.crearNodo(inicio)
+
+        while cola_prioridad:
+            distancia_actual, nodo_actual = cola_prioridad.pop(0)
+            valor_actual = nodo_actual.obtener_valor()
+
+            if valor_actual in visitados:
+                continue
+
+            visitados.add(valor_actual)
+
+            for vecino in nodo_actual.obtener_vecinos():
+                valor_vecino = vecino.obtener_valor()
+                peso = nodo_actual.obtener_peso_vecino(vecino)
+                nueva_distancia = distancia_actual + peso
+                #nueva_distancia = distancia_actual + 1  # Suponiendo peso 1 para las aristas
+
+                if nueva_distancia < distancias[valor_vecino]:
+                    distancias[valor_vecino] = nueva_distancia
+                    cola_prioridad.append((nueva_distancia, vecino))
+                    cola_prioridad.sort(key=lambda x: x[0])  # Ordenar por distancia
+                    # Agregar nodo y arista al árbol de caminos más cortos
+                    arbol_dijkstra.crearNodo(valor_vecino)
+                    arbol_dijkstra.agregar_arista(valor_actual, valor_vecino)
+
+        return arbol_dijkstra, distancias, inicio
+ 
 
     def __str__(self):
         tipo = "Dirigido" if self.dirigido else "No dirigido"
@@ -286,3 +333,24 @@ class Grafo:
         f.write(";\n}")
         f.close()
         
+    def archivo_grafo_Dijkstra(self, nombre_archivo, distancias, nodo_raiz):
+        with open(f"{nombre_archivo}.gv", "w") as f:
+            f.write(f"graph {nombre_archivo} {{\n")
+
+        # Escribir nodos con etiquetas (Raiz o Nodo con distancia)
+            for nodo in self.obtener_nodos():
+                valor = nodo.obtener_valor()
+                if str(valor) == str(nodo_raiz):
+                    etiqueta = f"Raiz {valor}"
+                else:
+                    etiqueta = f"Nodo {valor} ({distancias[valor]})"
+                f.write(f'    "{valor}" [label="{etiqueta}"];\n')
+
+        # Escribir aristas con su peso como etiqueta
+            for arista in self.obtener_aristas():
+                origen = arista.origen.obtener_valor()
+                destino = arista.destino.obtener_valor()
+                peso = arista.obtener_peso()
+                f.write(f'    "{origen}" -- "{destino}" [label="{peso}"];\n')
+
+            f.write("}\n")
