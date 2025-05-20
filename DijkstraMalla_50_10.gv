@@ -1,4 +1,4 @@
-graph Malla_50_10 {
+graph DijkstraMalla_50_10 {
     "0_0" [label="Raiz 0_0"];
     "0_1" [label="Nodo 0_1 (1)"];
     "1_0" [label="Nodo 1_0 (1)"];
