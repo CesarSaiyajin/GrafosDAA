@@ -6,7 +6,7 @@ Camino_corto,distancias, inicio=ErdosRenyi.Dijkstra(10)
 Camino_corto.archivo_grafo_Dijkstra('DijkstraErdosRenyi_50_10', distancias, inicio)
 
 ErdosRenyi = gr.Grafo()
-ErdosRenyi.ErdosRenyi(Nodos=200,Aristas=100)
+ErdosRenyi.ErdosRenyi(Nodos=200,Aristas=300)
 Camino_corto,distancias, inicio=ErdosRenyi.Dijkstra(100)
 Camino_corto.archivo_grafo_Dijkstra('DijkstraErdosRenyi_200_100', distancias, inicio)
 
