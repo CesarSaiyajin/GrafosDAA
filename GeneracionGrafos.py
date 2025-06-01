@@ -2,9 +2,27 @@ import Grafo as gr
 
 ErdosRenyi = gr.Grafo()
 ErdosRenyi.ErdosRenyi(Nodos=50,Aristas=100)
-Camino_corto,distancias, inicio=ErdosRenyi.Dijkstra(10)
-Camino_corto.archivo_grafo_Dijkstra('DijkstraErdosRenyi_50_10', distancias, inicio)
+Camino_corto=ErdosRenyi.KruskalD()
+Camino_corto.archivo_grafo('KruskalDErdosRenyi_50_100')
 
+Camino_corto2=ErdosRenyi.KruskalI()
+Camino_corto2.archivo_grafo('KruskalIErdosRenyi_50_100')
+
+Camino_corto3=ErdosRenyi.Prim(0)
+Camino_corto3.archivo_grafo('PrimErdosRenyi_50_100')
+
+ErdosRenyi = gr.Grafo()
+ErdosRenyi.ErdosRenyi(Nodos=200,Aristas=400)
+Camino_corto=ErdosRenyi.KruskalD()
+Camino_corto.archivo_grafo('KruskalDErdosRenyi_200_400')
+
+Camino_corto2=ErdosRenyi.KruskalI()
+Camino_corto2.archivo_grafo('KruskalIErdosRenyi_200_400')
+
+Camino_corto3=ErdosRenyi.Prim(0)
+Camino_corto3.archivo_grafo('PrimErdosRenyi_200_400')
+
+"""
 ErdosRenyi = gr.Grafo()
 ErdosRenyi.ErdosRenyi(Nodos=200,Aristas=300)
 Camino_corto,distancias, inicio=ErdosRenyi.Dijkstra(100)
@@ -62,7 +80,7 @@ Malla.Malla(filas = 20, columnas=10)
 Camino_corto,distancias, inicio=Malla.Dijkstra('0_0')
 Camino_corto.archivo_grafo_Dijkstra('DijkstraMalla_200_100', distancias, inicio)
 
-"""
+
 ErdosRenyi = gr.Grafo()
 ErdosRenyi.ErdosRenyi(Nodos=50,Aristas=100)
 #ErdosRenyi.archivo_grafo('ErdosRenyi50')

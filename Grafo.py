@@ -3,6 +3,7 @@ import Nodo as nd
 import random  
 import math
 import collections
+import heapq
 
 class Grafo:
     def __init__(self, dirigido = False):
@@ -211,7 +212,7 @@ class Grafo:
                     # Añadimos la arista dirigida desde el padre al hijo en el árbol BFS
                     arbol_bfs.agregar_arista(valor_actual, valor_vecino)
 
-        return arbol_bfs
+        return arbol_bfs, visitados
     
     def DFS_R(self, inicio, visitados=None, arbol_dfs_r=None):
         if visitados is None:
@@ -315,6 +316,8 @@ class Grafo:
                     arbol_dijkstra.agregar_arista(valor_actual, valor_vecino)
 
         return arbol_dijkstra, distancias, inicio
+    
+
  
 
     def __str__(self):
@@ -354,3 +357,218 @@ class Grafo:
                 f.write(f'    "{origen}" -- "{destino}" [label="{peso}"];\n')
 
             f.write("}\n")
+            
+            
+    def _make_set(self, parent, rank, node_value):
+        """Inicializa un conjunto para un nodo."""
+        parent[node_value] = node_value
+        rank[node_value] = 0
+
+    def _find(self, parent, node_value):
+        """Encuentra el representante (raíz) del conjunto de un nodo con path compression."""
+        if parent[node_value] == node_value:
+            return node_value
+        parent[node_value] = self._find(parent, parent[node_value]) # Path compression
+        return parent[node_value]
+
+    def _union(self, parent, rank, i, j):
+        """Une dos conjuntos usando union by rank."""
+        root_i = self._find(parent, i)
+        root_j = self._find(parent, j)
+
+        if root_i != root_j:
+            # Adjunta el árbol más pequeño bajo la raíz del árbol más grande
+            if rank[root_i] < rank[root_j]:
+                parent[root_i] = root_j
+            elif rank[root_i] > rank[root_j]:
+                parent[root_j] = root_i
+            else:
+                parent[root_j] = root_i
+                rank[root_i] += 1
+            return True # Unión exitosa
+        return False # Ya están en el mismo conjunto (se forma un ciclo)
+    
+    
+    def KruskalD(self):
+        """
+        Algoritmo de Kruskal para encontrar el Árbol de Expansión Mínima (MST).
+        
+        Returns:
+            Grafo: Un nuevo objeto Grafo que representa el MST, o un grafo vacío si no es posible.
+        """
+        if self.dirigido:
+            print("Advertencia: Kruskal se aplica típicamente a grafos no dirigidos. Se ignorará la dirección de las aristas.")
+            # Para un MST en un grafo dirigido, se requiere un algoritmo más complejo (e.g., Edmonds' algorithm).
+            # Para simplificar, trataremos las aristas como no dirigidas para Kruskal.
+
+        # 1. Preparar las aristas: (peso, origen_valor, destino_valor)
+        edges = []
+        for arista_obj in self.obtener_aristas():
+            peso = arista_obj.obtener_peso()
+            origen_val = arista_obj.origen.obtener_valor()
+            destino_val = arista_obj.destino.obtener_valor()
+            edges.append((peso, origen_val, destino_val))
+            
+            # Si el grafo original es dirigido pero queremos un MST no dirigido,
+            # asegúrate de considerar ambas direcciones para las aristas si no lo hiciste al agregarlas.
+            # Sin embargo, dado que `agregar_arista` ya maneja `self.dirigido`, no es necesario aquí.
+
+        # 2. Ordenar las aristas por peso
+        edges.sort()
+
+        # 3. Inicializar Union-Find para todos los nodos
+        parent = {}
+        rank = {}
+        for nodo_obj in self.obtener_nodos():
+            self._make_set(parent, rank, nodo_obj.obtener_valor())
+
+        # 4. Construir el MST
+        mst_grafo = Grafo(dirigido=False) # El MST es un grafo no dirigido
+        num_edges_in_mst = 0
+        total_weight = 0
+
+        # Asegúrate de que todos los nodos existan en el grafo MST, incluso si no tienen aristas inicialmente
+        for nodo_obj in self.obtener_nodos():
+            mst_grafo.crearNodo(nodo_obj.obtener_valor())
+
+        for peso, origen_val, destino_val in edges:
+            if num_edges_in_mst == len(self.nodos) - 1: # Un MST de N nodos tiene N-1 aristas
+                break
+            
+            # Si la unión es exitosa, significa que la arista no forma un ciclo
+            if self._union(parent, rank, origen_val, destino_val):
+                mst_grafo.agregar_arista(origen_val, destino_val, peso)
+                num_edges_in_mst += 1
+                total_weight += peso
+        
+        # Opcional: Verificar si el grafo es conexo (si num_edges_in_mst < len(self.nodos) - 1, no lo es)
+        if len(self.nodos) > 0 and num_edges_in_mst < len(self.nodos) - 1:
+            print("Advertencia: El grafo no es conexo. Kruskal ha encontrado un Bosque de Expansión Mínima (MSF).")
+
+        print(f"Kruskal - Peso total del MST/MSF: {total_weight}")
+        return mst_grafo
+    
+    def eliminar_arista(self, origen_valor, destino_valor):
+        """
+        Elimina una arista entre dos nodos.
+        Retorna True si se eliminó, False si no existía.
+        """
+        nodo_origen = self.obtener_nodo(origen_valor)
+        nodo_destino = self.obtener_nodo(destino_valor)
+
+        if not nodo_origen or not nodo_destino:
+            return False
+
+        arista_encontrada = None
+        for arista in self.aristas:
+            o_val, d_val = arista.obtener_nodos()
+            if (o_val.obtener_valor() == origen_valor and d_val.obtener_valor() == destino_valor):
+                arista_encontrada = arista
+                break
+            if not self.dirigido and (o_val.obtener_valor() == destino_valor and d_val.obtener_valor() == origen_valor):
+                arista_encontrada = arista
+                break
+        
+        if arista_encontrada:
+            self.aristas.remove(arista_encontrada)
+            nodo_origen.eliminar_vecino(nodo_destino)
+            if not self.dirigido:
+                nodo_destino.eliminar_vecino(nodo_origen)
+            return True
+        return False
+    
+    
+    def KruskalI(self):
+ 
+    # 1. Ordenar las aristas de mayor a menor peso
+        edges = []
+        for arista_obj in self.obtener_aristas():
+            peso = arista_obj.obtener_peso()
+            origen_val = arista_obj.origen.obtener_valor()
+            destino_val = arista_obj.destino.obtener_valor()
+            edges.append((peso, origen_val, destino_val))
+        edges.sort(reverse=True)  # Mayor a menor
+
+    # 2. Crear una copia del grafo original
+        mst_grafo = Grafo(dirigido=False)
+        for nodo_obj in self.obtener_nodos():
+            mst_grafo.crearNodo(nodo_obj.obtener_valor())
+        for peso, origen, destino in edges:
+            mst_grafo.agregar_arista(origen, destino, peso)
+
+    # 3. Intentar eliminar cada arista (de mayor a menor peso)
+        for peso, origen, destino in edges:
+            eliminado = mst_grafo.eliminar_arista(origen, destino)
+            if not eliminado:
+                continue
+
+        # Verificar si el grafo sigue siendo conexo usando la función BFS
+            nodos = mst_grafo.obtener_nodos()
+            if not nodos:
+                continue
+            nodo_inicial = nodos[0].obtener_valor()
+            _,visitados = mst_grafo.BFS(nodo_inicial)
+
+        # Si no es conexo, restaurar la arista
+            if len(visitados) < len(nodos):
+                mst_grafo.agregar_arista(origen, destino, peso)
+                
+        if len(visitados) < len(nodos):
+            print("El grafo NO es conexon Kruskal inverso fallará :(.") 
+                        
+    # Calcular el peso total
+        total_weight = sum(arista.obtener_peso() for arista in mst_grafo.obtener_aristas()) #// (1 if mst_grafo.dirigido else 2)
+        print(f"Kruskal Inverso - Peso total del MST: {total_weight}")
+        
+        return mst_grafo
+
+    
+    def Prim(self, inicio):
+        """
+        Algoritmo de Prim para encontrar el Árbol de Expansión Mínima (MST).
+        Args:
+            inicio: valor del nodo inicial
+        Returns:
+            Grafo: Un nuevo objeto Grafo que representa el MST.
+        """
+        if inicio not in self.nodos:
+            return Grafo()
+
+        visitados = set()
+        mst_grafo = Grafo(dirigido=False)
+        mst_grafo.crearNodo(inicio)
+        visitados.add(inicio)
+
+        heap = []
+
+        # Agregar todas las aristas del nodo inicial al heap
+        nodo_inicio = self.obtener_nodo(inicio)
+        for vecino, peso in nodo_inicio.obtener_vecinos().items():
+            heapq.heappush(heap, (peso, inicio, vecino.obtener_valor()))
+
+        while heap and len(visitados) < len(self.nodos):
+            peso, origen, destino = heapq.heappop(heap)
+            if destino in visitados:
+                continue
+            mst_grafo.crearNodo(destino)
+            mst_grafo.agregar_arista(origen, destino, peso)
+            visitados.add(destino)
+            nodo_actual = self.obtener_nodo(destino)
+            for vecino, peso_vecino in nodo_actual.obtener_vecinos().items():
+                v = vecino.obtener_valor()
+                if v not in visitados:
+                    heapq.heappush(heap, (peso_vecino, destino, v))
+                    
+        if len(visitados) < len(self.nodos):
+            print("El grafo NO es conexo. El MST encontrado no incluye todos los nodos.")
+
+        total_weight = sum(arista.obtener_peso() for arista in mst_grafo.obtener_aristas())
+        print(f"Prim - Peso total del MST: {total_weight}")
+        return mst_grafo
+
+
+
+
+
+
+
