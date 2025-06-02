@@ -495,6 +495,7 @@ class Grafo:
             mst_grafo.crearNodo(nodo_obj.obtener_valor())
         for peso, origen, destino in edges:
             mst_grafo.agregar_arista(origen, destino, peso)
+            
 
     # 3. Intentar eliminar cada arista (de mayor a menor peso)
         for peso, origen, destino in edges:
@@ -513,8 +514,13 @@ class Grafo:
             if len(visitados) < len(nodos):
                 mst_grafo.agregar_arista(origen, destino, peso)
                 
-        if len(visitados) < len(nodos):
-            print("El grafo NO es conexon Kruskal inverso fallará :(.") 
+        # Verificación final de conexidad del grafo
+        nodos_finales = mst_grafo.obtener_nodos()
+        if nodos_finales:
+            nodo_inicial = nodos_finales[0].obtener_valor()
+            _, visitados_final = mst_grafo.BFS(nodo_inicial)
+            if len(visitados_final) < len(nodos_finales):
+                print("El grafo NO es conexo. Kruskal inverso falló :(")        
                         
     # Calcular el peso total
         total_weight = sum(arista.obtener_peso() for arista in mst_grafo.obtener_aristas()) #// (1 if mst_grafo.dirigido else 2)
