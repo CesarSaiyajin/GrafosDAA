@@ -2,6 +2,7 @@ class Nodo:
     def __init__(self, valor):
         self.valor=valor
         self.vecinos={}
+        self.attrs = {} 
         
     def agregar_vecino(self, nodo, peso = 1):
         self.vecinos[nodo] = peso

@@ -1,5 +1,15 @@
 import Grafo as gr
+import time
+import Visualizar as vis
 
+print('Creacion de grafos', time.strftime("%H:%M:%S"))
+grafo =gr.Grafo()
+grafo.Malla(25,10)
+vis.spring(grafo)
+
+print('termino de crear grafos ', time.strftime("%H:%M:%S"))
+
+'''
 ErdosRenyi = gr.Grafo()
 ErdosRenyi.ErdosRenyi(Nodos=50,Aristas=100)
 ErdosRenyi.archivo_grafo('ErdosRenyi50_100')
@@ -143,7 +153,7 @@ Camino_corto2.archivo_grafo('KruskalIMalla_20_10')
 
 Camino_corto3=Malla.Prim('0_0')
 Camino_corto3.archivo_grafo('PrimMalla_20_10')
-
+'''
 """
 ErdosRenyi = gr.Grafo()
 ErdosRenyi.ErdosRenyi(Nodos=200,Aristas=300)
