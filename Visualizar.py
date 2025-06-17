@@ -3,12 +3,12 @@ import pygame
 import random
 
 # create the main surface (or window)
-WIDTH, HEIGHT   = 3240, 2160
-BORDER          = 5
+WIDTH, HEIGHT   = 1920, 1080
+BORDER          = 10
 WIN             = pygame.display.set_mode((WIDTH, HEIGHT))
 
 # colors
-BG              = (251, 241, 199)
+BG              = (0, 0, 0)
 BLUE            = (69, 133, 136)
 BLACK           = (40, 40, 40)
 RED             = (157, 0, 6)
@@ -82,6 +82,16 @@ def init_nodes(g):
         x = random.randrange(NODE_MIN_WIDTH, NODE_MAX_WIDTH)
         y = random.randrange(NODE_MIN_HEIGHT, NODE_MAX_HEIGHT)
         node.attrs['coords'] = [x, y]
+        node.attrs['color_fill'] = (
+            random.randint(0, 255),
+            random.randint(0, 255),
+            random.randint(0, 255)
+        )
+        node.attrs['color_border'] = (
+            random.randint(0, 255),
+            random.randint(0, 255),
+            random.randint(0, 255)
+        )
 
     return
 
@@ -151,8 +161,10 @@ def draw_nodes(g):
     """
 
     for node in g.obtener_nodos():
-        pygame.draw.circle(WIN, BLUE, node.attrs['coords'], NODE_RADIUS - 3, 0)
-        pygame.draw.circle(WIN, RED, node.attrs['coords'], NODE_RADIUS, 3)
+        color_fill = node.attrs.get('color_fill', BLUE)
+        color_border = node.attrs.get('color_border', RED)
+        pygame.draw.circle(WIN, color_fill, node.attrs['coords'], NODE_RADIUS - 3, 0)
+        pygame.draw.circle(WIN, color_border, node.attrs['coords'], NODE_RADIUS, 3)
 
     return
 
@@ -172,6 +184,8 @@ def draw_edges(g):
         u_pos = u.attrs['coords']
         v_pos = v.attrs['coords']
 
-        pygame.draw.line(WIN, BLACK, u_pos, v_pos, 1)
+        pygame.draw.line(WIN, (255, 255, 255), u_pos, v_pos, 1)
 
     return
+
+
