@@ -56,6 +56,7 @@ grafo =gr.Grafo()
 grafo.Malla(10,10)
 vis.spring(grafo)
 '''
+
 grafo =gr.Grafo()
 grafo.Malla(25,20)
 vis.spring(grafo)
