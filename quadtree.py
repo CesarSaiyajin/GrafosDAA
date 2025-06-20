@@ -1,139 +1,48 @@
-import math
-
-import pygame
-
-
-class Point:
-    def __init__(self, x, y, datos):
-        self.x = x
-        self.y = y
-        self.data = datos
-
-
-class Rectangle:
-    def __init__(self, xi, yi, xf, yf):
-        self.xi = min(xi, xf)
-        self.yi = min(yi, yf)
-        self.xf = max(xi, xf)
-        self.yf = max(yi, yf)
-        self.w = xf - xi
-        self.h = yf - yi
-
-    def contains(self, point):
-        return self.xi <= point.x <= self.xf and self.yi <= point.y <= self.yf
-
-    def intersects(self, otro):
-        return not (otro.xi > self.xf or otro.xf < self.xi or otro.yi > self.yf or otro.yf < self.yi)
-
-
-class Circle:
-    def __init__(self, x, y, r):
-        self.x = x
-        self.y = y
-        self.r = r
-        self.r2 = r * r
-
-    def contains(self, punto):
-        d = (punto.x - self.x) ** 2 + (punto.y - self.y) ** 2
-        return d <= self.r2
-
-    def intersects(self, rect):
-        xDist = abs((rect.xi + rect.xf) / 2 - self.x)
-        yDist = abs((rect.yi + rect.yf) / 2 - self.y)
-
-        r = self.r
-        w = rect.xf - rect.xi
-        h = rect.yf - rect.yf
-
-        edges = (xDist - w) ** 2 + (yDist - h) ** 2
-
-        if xDist > (r + w) or yDist > (r + h):
-            return False
-
-        if xDist <= w or yDist <= h:
-            return True
-
-        return edges <= self.r2
-
-
 class QuadTree:
-    def __init__(self, limits=Rectangle(0, 0, 1, 1), capacity=8):
-        if capacity < 1:
-            capacity = 1
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.divided = False
+        self.nodos = []
+        self.mass = 0
+        self.center = [0, 0]
+        self.NW = self.NE = self.SW = self.SE = None
 
-        self.limits = limits
-        self.capacity = capacity
-        self.points = []
-        self.is_divided = False
-        self.attr = {}
-
-    def subdivide(self):
-        xi = self.limits.xi
-        yi = self.limits.yi
-        xf = self.limits.xf
-        yf = self.limits.yf
-        xc = (xi + xf) / 2
-        yc = (yi + yf) / 2
-
-        I = Rectangle(xc, yc, xf, yf)
-        II = Rectangle(xi, yc, xc, yf)
-        III = Rectangle(xi, yi, xc, yc)
-        IV = Rectangle(xc, yi, xf, yc)
-
-        self.I = QuadTree(I, self.capacity)
-        self.II = QuadTree(II, self.capacity)
-        self.III = QuadTree(III, self.capacity)
-        self.IV = QuadTree(IV, self.capacity)
-
-        self.is_divided = True
-
-    def insert(self, point):
-        if not self.limits.contains(point):
+    def insert(self, nodo):
+        x, y = nodo.attrs['coords']
+        if not (self.x <= x <= self.x + self.width and self.y <= y <= self.y + self.height):
             return False
 
-        if len(self.points) < self.capacity:
-            self.points.append(point)
-            return True
+        self.nodos.append(nodo)
+        self.mass += 1
+        self._update_center()
 
-        if not self.is_divided:
-            self.subdivide()
+        if self.mass > 1 and not self.divided:
+            self._subdivide()
+            for n in self.nodos:
+                self._insert_children(n)
+            self.nodos = []
+        return True
 
-        return self.I.insert(point) or self.II.insert(point) or self.III.insert(point) or self.IV.insert(point)
+    def _update_center(self):
+        if self.mass == 0:
+            self.center = [0, 0]
+        else:
+            x_sum = sum(n.attrs['coords'][0] for n in self.nodos)
+            y_sum = sum(n.attrs['coords'][1] for n in self.nodos)
+            self.center = [x_sum / self.mass, y_sum / self.mass]
 
-    def query(self, range, found=[]):
-        if not range.intersects(self.limits):
-            return found
+    def _subdivide(self):
+        w, h = self.width / 2, self.height / 2
+        self.NW = QuadTree(self.x, self.y, w, h)
+        self.NE = QuadTree(self.x + w, self.y, w, h)
+        self.SW = QuadTree(self.x, self.y + h, w, h)
+        self.SE = QuadTree(self.x + w, self.y + h, w, h)
+        self.divided = True
 
-        for p in self.points:
-            if range.contains(p):
-                found.append(p)
-
-        if self.is_divided:
-            self.I.query(range, found)
-            self.II.query(range, found)
-            self.III.query(range, found)
-            self.IV.query(range, found)
-
-        return found
-
-    def draw(self, sup, color, transf):
-        xi = self.limits.xi
-        yi = self.limits.yi
-        xf = self.limits.xf
-        yf = self.limits.yf
-        I = transf.transformar([xi, yi])
-        F = transf.transformar([xf, yf])
-        pygame.draw.rect(
-            sup, color, (I[0], I[1], F[0] - I[0], F[1] - I[1]), width=1)
-        # dibujar_rect_punteado(sup, color, I, F)
-
-        if self.is_divided:
-            self.I.draw(sup, color, transf)
-            self.II.draw(sup, color, transf)
-            self.III.draw(sup, color, transf)
-            self.IV.draw(sup, color, transf)
-
-        # for p in self.puntos:
-        #     P = transf.transformar([p.x, p.y])
-        #     pygame.draw.line(sup, color, (P[0] - 5, P[1] - 5), (P[0] + 5, P[1] + 5))
-        #     pygame.draw.line(sup, color, (P[0] - 5, P[1] + 5), (P[0] + 5, P[1] - 5))
+    def _insert_children(self, nodo):
+        for child in [self.NW, self.NE, self.SW, self.SE]:
+            if child.insert(nodo):
+                break

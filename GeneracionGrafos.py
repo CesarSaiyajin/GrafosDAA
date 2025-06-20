@@ -1,6 +1,6 @@
 import Grafo as gr
-import time
 import Fruchterman_Reigold as visFR
+import BarnesHut as visBH
 '''
 grafo = gr.Grafo()
 grafo.ErdosRenyi(100, 300)
@@ -61,7 +61,12 @@ grafo =gr.Grafo()
 grafo.Malla(25,20)
 vis.spring(grafo)
 '''
+'''
+grafo =gr.Grafo()
+grafo.Malla(5,5)
+visFR.Fruch_Reig(grafo)
+'''
 
 grafo =gr.Grafo()
-grafo.Malla(10,10)
-visFR.Fruch_Reig(grafo)
+grafo.Malla(20,20)
+visBH.BarnesHut(grafo)

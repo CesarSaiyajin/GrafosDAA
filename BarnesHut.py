@@ -1,40 +1,59 @@
-from math import sqrt
+from math import sqrt, atan2, cos, sin
 import pygame
 import random
+import QuadTree as qtr
 
-# create the main surface (or window)
+# Configuración de ventana
 WIDTH, HEIGHT = 1020, 720
 BORDER = 10
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 
-# colors
+# Colores
 BG = (0, 0, 0)
 BLUE = (69, 133, 136)
 BLACK = (40, 40, 40)
 RED = (157, 0, 6)
 
-# configuration
-ITERS = 1000
+# Parámetros de simulación
+ITERS = 10000
 FPS = 60
 NODE_RADIUS = 8
 NODE_MIN_WIDTH = 10
 NODE_MIN_HEIGHT = 10
 NODE_MAX_WIDTH = WIDTH - 10
 NODE_MAX_HEIGHT = HEIGHT - 10
+THETA = 1000  # parámetro de aproximación de Barnes-Hut
+
+def compute_repulsion_force(p, q, k, theta):
+    f = [0.0, 0.0]
+    v = [p.attrs['coords'][0] - q.center[0], p.attrs['coords'][1] - q.center[1]]
+    dist = sqrt(v[0]**2 + v[1]**2) or 0.01
+    d = sqrt(q.width * q.height)
+
+    if dist == 0:
+        return [0.0, 0.0]
+
+    if (d / dist < theta) or not q.divided:
+        fr = (k * k) / dist
+        f[0] = (v[0] / dist) * fr * q.mass
+        f[1] = (v[1] / dist) * fr * q.mass
+        return f
+    else:
+        for child in [q.NW, q.NE, q.SW, q.SE]:
+            child_force = compute_repulsion_force(p, child, k, theta)
+            f[0] += child_force[0]
+            f[1] += child_force[1]
+        return f
 
 
-def Fruch_Reig(g, fuerza=0.3,ITERS=ITERS):
-    """
-    Visualización basada en el algoritmo de Fruchterman-Reingold.
-    """
+def BarnesHut(g, fuerza=.2, ITERS=ITERS):
     run = True
     clock = pygame.time.Clock()
-
     init_nodes(g)
 
     area = (NODE_MAX_WIDTH - NODE_MIN_WIDTH) * (NODE_MAX_HEIGHT - NODE_MIN_HEIGHT)
-    k = sqrt(area / len(g.obtener_nodos())) * fuerza
-    t = min(WIDTH, HEIGHT) / 10  # temperatura inicial
+    k = sqrt(area / len(g.obtener_nodos()))*fuerza
+    t = min(WIDTH, HEIGHT) / 10
 
     i = 0
     while run:
@@ -43,6 +62,7 @@ def Fruch_Reig(g, fuerza=0.3,ITERS=ITERS):
             if event.type == pygame.QUIT:
                 run = False
         if i > ITERS:
+            run = False
             continue
 
         WIN.fill(BG)
@@ -50,18 +70,15 @@ def Fruch_Reig(g, fuerza=0.3,ITERS=ITERS):
         draw_edges(g)
         draw_nodes(g)
         pygame.display.update()
+        pygame.image.save(WIN, f"frames/frame_{i:04d}.png")
 
-        t *= 0.95  # enfriar temperatura
+        t *= 0.95
         i += 1
 
     pygame.quit()
-    return
 
 
 def init_nodes(g):
-    """
-    Inicializa los nodos del grafo g en posiciones aleatorias.
-    """
     for node in g.obtener_nodos():
         x = random.randrange(NODE_MIN_WIDTH, NODE_MAX_WIDTH)
         y = random.randrange(NODE_MIN_HEIGHT, NODE_MAX_HEIGHT)
@@ -76,30 +93,19 @@ def init_nodes(g):
             random.randint(0, 150),
             random.randint(0, 150)
         )
-    return
 
 
 def update_nodes(g, t, k):
-    """
-    Aplica el algoritmo de Fruchterman-Reingold para actualizar las posiciones.
-    """
-    # Inicializar desplazamiento
-    for v in g.obtener_nodos():
-        v.attrs['disp'] = [0.0, 0.0]
+    # Construir QuadTree
+    qt = qtr.QuadTree(0, 0, WIDTH, HEIGHT)
+    for n in g.obtener_nodos():
+        qt.insert(n)
 
-    # Fuerzas de repulsión
+    # Fuerza de repulsión
     for v in g.obtener_nodos():
-        for u in g.obtener_nodos():
-            if v == u:
-                continue
-            dx = v.attrs['coords'][0] - u.attrs['coords'][0]
-            dy = v.attrs['coords'][1] - u.attrs['coords'][1]
-            dist = sqrt(dx**2 + dy**2) or 0.01
-            fr = (k * k) / dist
-            v.attrs['disp'][0] += (dx / dist) * fr
-            v.attrs['disp'][1] += (dy / dist) * fr
+        v.attrs['disp'] = compute_repulsion_force(v, qt, k, THETA)
 
-    # Fuerzas de atracción
+    # Fuerza de atracción
     for e in g.obtener_aristas():
         u, v = e.obtener_nodos()
         dx = v.attrs['coords'][0] - u.attrs['coords'][0]
@@ -113,7 +119,7 @@ def update_nodes(g, t, k):
         u.attrs['disp'][0] += disp_x
         u.attrs['disp'][1] += disp_y
 
-    # Actualizar posiciones con desplazamiento limitado
+    # Actualizar posiciones
     for v in g.obtener_nodos():
         dx, dy = v.attrs['disp']
         disp_len = sqrt(dx**2 + dy**2) or 0.01
@@ -122,31 +128,25 @@ def update_nodes(g, t, k):
         v.attrs['coords'][0] += limited_dx
         v.attrs['coords'][1] += limited_dy
 
-        # Limitar dentro del marco
+        # Limitar al marco
         v.attrs['coords'][0] = min(NODE_MAX_WIDTH, max(NODE_MIN_WIDTH, v.attrs['coords'][0]))
         v.attrs['coords'][1] = min(NODE_MAX_HEIGHT, max(NODE_MIN_HEIGHT, v.attrs['coords'][1]))
-    return
 
 
 def draw_nodes(g):
-    """
-    Dibuja los nodos del grafo g.
-    """
     for node in g.obtener_nodos():
         color_fill = node.attrs.get('color_fill', BLUE)
         color_border = node.attrs.get('color_border', RED)
         pygame.draw.circle(WIN, color_fill, node.attrs['coords'], NODE_RADIUS - 2, 0)
         pygame.draw.circle(WIN, color_border, node.attrs['coords'], NODE_RADIUS, 2)
-    return
 
 
 def draw_edges(g):
-    """
-    Dibuja las aristas del grafo g.
-    """
     for edge in g.obtener_aristas():
         u, v = edge.obtener_nodos()
         u_pos = u.attrs['coords']
         v_pos = v.attrs['coords']
         pygame.draw.line(WIN, (255, 255, 255), u_pos, v_pos, 1)
-    return
+
+
+

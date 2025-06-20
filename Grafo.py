@@ -4,7 +4,7 @@ import random
 import math
 import collections
 import heapq
-
+import QuadTree as qt
 class Grafo:
     def __init__(self, dirigido = False):
         self.nodos = {}
@@ -73,7 +73,8 @@ class Grafo:
         return self.aristas
     
     def obtener_nodos(self):
-        return list(self.nodos.values())       
+        return list(self.nodos.values())  
+                 
         
     def ErdosRenyi(self, Nodos, Aristas):
         for nodo in range(Nodos):
