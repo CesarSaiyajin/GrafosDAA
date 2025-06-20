@@ -1,16 +1,15 @@
 import Grafo as gr
-import time
 import Visualizar as vis
 '''
 grafo = gr.Grafo()
 grafo.ErdosRenyi(100, 300)
 vis.spring(grafo)
 '''
-'''
+
 grafo =gr.Grafo()
 grafo.ErdosRenyi(500,700)
 vis.spring(grafo)
-'''
+
 '''
 grafo =gr.Grafo()
 grafo.Gilbert(100,.5)
@@ -56,7 +55,8 @@ grafo =gr.Grafo()
 grafo.Malla(10,10)
 vis.spring(grafo)
 '''
-
+'''
 grafo =gr.Grafo()
 grafo.Malla(25,20)
 vis.spring(grafo)
+'''
