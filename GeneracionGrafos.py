@@ -179,15 +179,17 @@ grafo =gr.Grafo()
 grafo.Malla(10,10)
 visBH.BarnesHut(grafo)
 '''
+'''
 grafo =gr.Grafo()
 grafo.Malla(25,25)
 visBH.BarnesHut(grafo)
 '''
+
 ErdosRenyi = gr.Grafo()
 ErdosRenyi.ErdosRenyi(Nodos=500,Aristas=1000)
 #ErdosRenyi.archivo_grafo('ErdosRenyi500')
 arbol,_=ErdosRenyi.BFS(0)
 arbol2=ErdosRenyi.DFS_R(0)
 arbol3=ErdosRenyi.DFS_I(0)
-visBH.BarnesHut(arbol)
-'''
+#visBH.BarnesHut(arbol)
+visFR.Fruch_Reig(arbol)
