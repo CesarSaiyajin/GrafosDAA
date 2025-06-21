@@ -50,6 +50,7 @@ def Fruch_Reig(g, fuerza=0.3,ITERS=ITERS):
         draw_edges(g)
         draw_nodes(g)
         pygame.display.update()
+        pygame.image.save(WIN, f"frames/frame_{i:04d}.png")
 
         t *= 0.95  # enfriar temperatura
         i += 1

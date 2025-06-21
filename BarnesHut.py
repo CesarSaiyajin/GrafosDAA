@@ -1,7 +1,7 @@
 from math import sqrt, atan2, cos, sin
 import pygame
 import random
-import QuadTree as qtr
+import quadtree as qtr
 
 # Configuración de ventana
 WIDTH, HEIGHT = 1020, 720

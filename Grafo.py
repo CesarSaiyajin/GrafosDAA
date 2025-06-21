@@ -4,7 +4,7 @@ import random
 import math
 import collections
 import heapq
-import QuadTree as qt
+import quadtree as qt
 class Grafo:
     def __init__(self, dirigido = False):
         self.nodos = {}
