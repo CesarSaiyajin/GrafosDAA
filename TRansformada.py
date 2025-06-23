@@ -53,7 +53,7 @@ fft_filtered = fft_data.copy()
 fft_filtered[np.abs(frequencies) > cutoff_freq] = 0
 magnitude_filtered = np.abs(fft_filtered)
 
-# 🎨 Mostrar ambas gráficas en una sola ventana
+# Mostrar ambas gráficas en una sola ventana
 plt.figure(figsize=(12, 6))
 
 # Espectro original
@@ -85,7 +85,7 @@ filtered_signal = np.int16(filtered_signal / np.max(np.abs(filtered_signal)) * 3
 output_path = os.path.join(os.path.dirname(file_path), "salida_filtrada.wav")
 write(output_path, sample_rate, filtered_signal)
 
-print(f"\n✅ Audio filtrado guardado en: {output_path}")
+print(f"\n Audio filtrado guardado en: {output_path}")
 
 
 
