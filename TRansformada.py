@@ -56,28 +56,6 @@ fft_filtered = fft_data.copy()
 fft_filtered[np.abs(frequencies) > cutoff_freq] = 0
 magnitude_filtered = np.abs(fft_filtered)
 
-# Mostrar ambas gráficas en una sola ventana
-plt.figure(figsize=(12, 6))
-
-# Espectro original
-plt.subplot(2, 1, 1)
-plt.plot(frequencies[:N//2], magnitude[:N//2], color='blue')
-plt.title("Espectro Original")
-plt.xlabel("Frecuencia (Hz)")
-plt.ylabel("Magnitud")
-plt.grid(True)
-
-# Espectro filtrado
-plt.subplot(2, 1, 2)
-plt.plot(frequencies[:N//2], magnitude_filtered[:N//2], color='green')
-plt.title("Espectro Después del Filtro Pasabajas (2000 Hz)")
-plt.xlabel("Frecuencia (Hz)")
-plt.ylabel("Magnitud")
-plt.grid(True)
-
-plt.tight_layout()
-plt.show()
-
 # Transformada inversa (IFFT)
 filtered_signal = ifft_recursive(fft_filtered)
 
@@ -87,6 +65,47 @@ filtered_signal = filtered_signal[:N_original]
 # Normalizar y convertir a enteros
 filtered_signal = np.int16(filtered_signal / np.max(np.abs(filtered_signal)) * 32767)
 
+# Tiempo para el dominio temporal
+time = np.linspace(0, N_original / sample_rate, N_original)
+
+# Mostrar gráficas
+plt.figure(figsize=(14, 10))
+
+# 1. Audio original (tiempo)
+plt.subplot(4, 1, 1)
+plt.plot(time, samples, color='blue')
+plt.title("Audio Original (Dominio del Tiempo)")
+plt.xlabel("Tiempo (s)")
+plt.ylabel("Amplitud")
+plt.grid(True)
+
+# 2. Audio filtrado (tiempo)
+plt.subplot(4, 1, 2)
+plt.plot(time, filtered_signal, color='green')
+plt.title("Audio Filtrado (Dominio del Tiempo)")
+plt.xlabel("Tiempo (s)")
+plt.ylabel("Amplitud")
+plt.grid(True)
+
+# 3. Espectro original
+plt.subplot(4, 1, 3)
+plt.plot(frequencies[:N//2], magnitude[:N//2], color='blue')
+plt.title("Espectro Original (Dominio de la Frecuencia)")
+plt.xlabel("Frecuencia (Hz)")
+plt.ylabel("Magnitud")
+plt.grid(True)
+
+# 4. Espectro filtrado
+plt.subplot(4, 1, 4)
+plt.plot(frequencies[:N//2], magnitude_filtered[:N//2], color='green')
+plt.title("Espectro Filtrado (Filtro Pasabajas a 2000 Hz)")
+plt.xlabel("Frecuencia (Hz)")
+plt.ylabel("Magnitud")
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()
+9
 # Guardar archivo WAV de salida
 output_path = os.path.join(os.path.dirname(file_path), "salida_filtrada.wav")
 write(output_path, sample_rate, filtered_signal)
